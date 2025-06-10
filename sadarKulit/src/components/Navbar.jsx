@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -12,6 +13,24 @@ export default function Navbar() {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Apakah Anda yakin ingin keluar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, keluar",
+      cancelButtonText: "Batal",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("token");
+        window.location.reload();
+        if (isMenuOpen) toggleMenu(); // Close mobile menu if open
+      }
+    });
   };
 
   return (
@@ -68,13 +87,10 @@ export default function Navbar() {
               </li>
               <li>
                 <button
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    window.location.reload();
-                  }}
+                  onClick={handleLogout}
                   className="hover:text-red-400"
                 >
-                  Logout
+                  Keluar
                 </button>
               </li>
             </>
@@ -121,14 +137,10 @@ export default function Navbar() {
               </li>
               <li>
                 <button
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    window.location.reload();
-                    toggleMenu();
-                  }}
+                  onClick={handleLogout}
                   className="hover:text-red-400"
                 >
-                  Logout
+                  Keluar
                 </button>
               </li>
             </>
@@ -140,9 +152,8 @@ export default function Navbar() {
                 </Link>
               </li>
               <li>
-                <Link to="/register" className="hover:text-cyan-400" onClick={toggleMenu}>
+                <Link to="/register" className="hover:text-cyan-400" onClick={toggleMenu}></Link>
                   Daftar
-                </Link>
               </li>
             </>
           )}
