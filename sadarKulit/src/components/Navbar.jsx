@@ -89,10 +89,11 @@ export default function Navbar() {
               <li>
                 <button
                   onClick={handleLogout}
-                  className="hover:text-red-400"
+                  className="text-inherit hover:text-red-400 cursor-pointer transition duration-300"
                 >
                   Keluar
                 </button>
+
               </li>
             </>
           ) : (

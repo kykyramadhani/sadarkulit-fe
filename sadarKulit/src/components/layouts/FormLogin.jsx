@@ -1,8 +1,10 @@
 import InputForm from "../../components/elements/Input";
 import Button from "../elements/Button";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function FormLogin() {
+  const navigate = useNavigate();
   const handleLogin = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
