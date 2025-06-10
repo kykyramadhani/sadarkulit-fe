@@ -78,7 +78,6 @@ export default function FormRegister() {
       });
     } finally {
       setLoading(false);
-      Swal.close();
     }
   };
 
