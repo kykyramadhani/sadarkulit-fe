@@ -3,7 +3,7 @@ import AuthorLayout from "../components/layouts/AuthorLayout";
 
 export default function Register () {
     return (
-       <AuthorLayout tittle="Register" type="register">
+       <AuthorLayout tittle="Daftar" type="register">
             <FormRegister />
         </AuthorLayout>
     );

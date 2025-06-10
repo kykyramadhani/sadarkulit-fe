@@ -21,7 +21,7 @@ export default function Navbar() {
       title: "Apakah Anda yakin ingin keluar?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
+      confirmButtonColor: "#00bcd4",
       cancelButtonColor: "#d33",
       confirmButtonText: "Ya, keluar",
       cancelButtonText: "Batal",

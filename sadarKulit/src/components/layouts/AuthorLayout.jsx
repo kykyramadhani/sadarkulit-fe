@@ -12,7 +12,7 @@ export default function AuthorLayout({ tittle, children, type}) {
               {children}
 
               {type === "login" ? (
-                  <p className="text-center">Belum Punya Akun? <Link to="/register" className="text-cyan-500 font-bold">Register</Link></p>
+                  <p className="text-center">Belum Punya Akun? <Link to="/register" className="text-cyan-500 font-bold">Daftar</Link></p>
               ) : (
                   <p className="text-center">Sudah Punya Akun? <Link to="/login" className="text-cyan-500 font-bold">Login</Link></p>
               )}
