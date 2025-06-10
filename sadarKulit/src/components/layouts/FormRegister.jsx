@@ -66,7 +66,7 @@ export default function FormRegister() {
         timer: 2000,
         showConfirmButton: false,
       }).then(() => {
-        window.location.href = "/login";
+        window.location.href = "/";
       });
     } catch (error) {
       Swal.fire({
