@@ -5,7 +5,7 @@ import Navbar from "../components/Navbar";
 export default function Login () {
     return (
         
-        <AuthorLayout tittle="Login" type="login">
+        <AuthorLayout title="Masuk" type="login">
             <FormLogin />
         </AuthorLayout>
     );

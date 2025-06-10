@@ -98,7 +98,7 @@ export default function Navbar() {
             <>
               <li>
                 <Link to="/login" className="hover:text-cyan-400">
-                  Login
+                  Masuk
                 </Link>
               </li>
               <li>

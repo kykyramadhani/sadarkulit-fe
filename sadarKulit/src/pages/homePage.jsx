@@ -169,7 +169,7 @@ export default function HomePage() {
           {!loading && !isLoggedIn && (
             <div className="text-center">
               <p className="text-gray-600 text-base sm:text-lg mb-4">
-                Oops, kamu belum login 😅
+                Oops, kamu belum masuk 😅
               </p>
               <button
                 onClick={() => navigate("/login")}

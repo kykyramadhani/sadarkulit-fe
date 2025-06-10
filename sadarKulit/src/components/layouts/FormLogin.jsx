@@ -55,7 +55,7 @@ export default function FormLogin() {
       Swal.fire({
         icon: "error",
         title: "Kesalahan",
-        text: "Terjadi kesalahan saat login. Silakan coba lagi.",
+        text: "Terjadi kesalahan saat masuk. Silakan coba lagi.",
         confirmButtonColor: "#d33",
       });
     }
