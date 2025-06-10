@@ -2,10 +2,11 @@ import { useState } from "react";
 import InputForm from "../../components/elements/Input";
 import Button from "../elements/Button";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export default function FormRegister() {
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   const handleRegister = async (e) => {
     e.preventDefault();
 
