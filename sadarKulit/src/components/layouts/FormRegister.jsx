@@ -62,11 +62,11 @@ export default function FormRegister() {
       Swal.fire({
         icon: "success",
         title: "Registrasi Berhasil",
-        text: "Akun Anda telah dibuat. Anda akan diarahkan ke halaman login.",
+        text: "Akun Anda telah dibuat. Anda akan diarahkan ke halaman utama.",
         timer: 2000,
         showConfirmButton: false,
       }).then(() => {
-        window.location.href = "/";
+        navigate("/");
       });
     } catch (error) {
       Swal.fire({

@@ -48,7 +48,7 @@ export default function FormLogin() {
         timer: 1500,
         showConfirmButton: false,
       }).then(() => {
-        window.location.href = "/";
+        navigate("/");
       });
     } catch (error) {
       console.error("Login error:", error);

@@ -28,7 +28,7 @@ export default function Navbar() {
       if (result.isConfirmed) {
         localStorage.removeItem("token");
         window.location.reload();
-        if (isMenuOpen) toggleMenu(); // Close mobile menu if open
+        if (isMenuOpen) toggleMenu(); 
       }
     });
   };
