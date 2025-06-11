@@ -7,6 +7,7 @@ import { classLabels } from "../data/classLabels";
 // --- PRASYARAT 1: Impor data dan komponen yang dibutuhkan ---
 import { firstAidData } from "../data/firstAidData"; // Pastikan path ini benar
 import DetectionResult from "../components/DetectionResult"; // Pastikan komponen ini ada dan path-nya benar
+import Footer from "../components/Footer";
 // ---------------------------------------------------------
 
 export default function HomePage() {
@@ -313,6 +314,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
