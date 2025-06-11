@@ -24,7 +24,7 @@ export default function Footer() {
               <img src="/Logo.png" alt="SadarKulit Logo" className="h-12 w-auto" />
             </RouterLink>
             <p className="text-gray-400">
-              Membantu Anda mengenali kondisi kulit lebih dini menggunakan teknologi Machine Learning.
+              Membantu Anda mengenali kondisi kulit lebih dini menggunakan teknologi Berbasis Website & Machine Learning.
             </p>
           </div>
 
