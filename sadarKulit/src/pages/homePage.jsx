@@ -10,6 +10,26 @@ export default function HomePage() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const fetchHistory = async (token) => {
+    try {
+      const response = await fetch("https://sadarkulit-be.vercel.app/history", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        const errMsg = await response.json();
+        throw new Error(errMsg.message || "Gagal mengambil data riwayat");
+      }
+      const data = await response.json();
+      setHistoryData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -19,28 +39,7 @@ export default function HomePage() {
     }
 
     setIsLoggedIn(true);
-
-    // Fetch history dari backend
-    fetch("https://sadarkulit-be.vercel.app/history", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errMsg = await res.json();
-          throw new Error(errMsg.message || "Gagal mengambil data riwayat");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setHistoryData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    fetchHistory(token);
   }, []);
 
   const handleUpload = async (e) => {
@@ -51,6 +50,16 @@ export default function HomePage() {
         icon: "warning",
         title: "Pilih Gambar",
         text: "Silakan pilih gambar untuk diunggah!",
+        confirmButtonColor: "#3085d6",
+      });
+      return;
+    }
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Format Tidak Didukung",
+        text: "Hanya file JPEG atau PNG yang diizinkan!",
         confirmButtonColor: "#3085d6",
       });
       return;
@@ -69,10 +78,15 @@ export default function HomePage() {
       const formData = new FormData();
       formData.append("image", file);
 
-      const response = await fetch("https://sadarkulit-be.vercel.app/detect", {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Anda harus login untuk melakukan deteksi");
+      }
+
+      const response = await fetch("https://sadarkulit-be.vercel.app/predict", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -80,15 +94,18 @@ export default function HomePage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Gagal mendeteksi penyakit kulit");
+        throw new Error(data.error || "Gagal mendeteksi penyakit kulit");
       }
 
       Swal.fire({
         icon: "success",
         title: "Deteksi Berhasil",
-        text: `Hasil deteksi: ${data.detectedDisease || "Tidak diketahui"}`,
+        html: `Hasil deteksi: <strong>${data.predicted_disease}</strong><br>Perkiraan akurasi: <strong>${(data.confidence * 100).toFixed(2)}%</strong>`,
         confirmButtonColor: "#3085d6",
       });
+
+      await fetchHistory(token);
+
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -117,7 +134,10 @@ export default function HomePage() {
           <p className="text-lg sm:text-xl md:text-2xl text-black mb-6 sm:mb-8 leading-relaxed">
             Website Pendeteksi Penyakit Kulit
           </p>
-          <button className="px-6 py-2 sm:px-8 sm:py-3 border border-cyan-500 bg-transparent rounded-3xl hover:bg-cyan-500 hover:text-white transition duration-300">
+          <button
+            onClick={() => document.querySelector('input[name="image"]').click()}
+            className="px-6 py-2 sm:px-8 sm:py-3 border border-cyan-500 bg-transparent rounded-3xl hover:bg-cyan-500 hover:text-white transition duration-300"
+          >
             <p className="text-cyan-500 hover:text-white">Deteksi Sekarang</p>
           </button>
         </div>
@@ -138,7 +158,7 @@ export default function HomePage() {
             <input
               type="file"
               name="image"
-              accept="image/*"
+              accept="image/jpeg,image/png"
               className="border border-gray-300 rounded-3xl p-2 w-full sm:w-auto"
             />
             <button
@@ -153,18 +173,13 @@ export default function HomePage() {
 
       {/* Riwayat Section */}
       <div className="relative mt-8 sm:mt-12 md:mt-16 flex flex-col md:flex-row justify-center px-4 sm:px-6">
-        {/* <img
-          src="/rectangle1.png"
-          alt="SadarKulit Logo"
-          className="mt-"
-        /> */}
         <div className="flex w-full flex-col items-center text-center">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-black mb-6 md:mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-medium text-gray-600 mb-6 md:mb-10">
             Riwayat Kulit Kamu
           </h1>
 
-          {loading && <p>Loading riwayat...</p>}
-          {error && <p className="text-red-500">Error: {error}</p>}
+          {loading && <p className="text-gray-600">Loading riwayat...</p>}
+          {error && <p className="text-red-600">Error: {error}</p>}
 
           {!loading && !isLoggedIn && (
             <div className="text-center">
@@ -191,7 +206,7 @@ export default function HomePage() {
               {historyData.map((item, idx) => (
                 <div key={item._id || idx} className="flex items-center space-x-3">
                   <span className="text-gray-700 text-sm sm:text-base">
-                    {new Date(item.dateChecked).toLocaleDateString()}
+                    {new Date(item.dateChecked).toLocaleDateString('id-ID')}
                   </span>
                   <button className="px-4 py-2 bg-white border border-gray-300 rounded-full text-gray-700 text-sm sm:text-base">
                     {item.detectedDisease || "Tidak diketahui"}
