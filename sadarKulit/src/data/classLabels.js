@@ -1,14 +1,15 @@
 // src/data/classLabels.js
 
 export const classLabels = {
-  "0": "1. Eczema 1677",
-  "1": "10. Warts Molluscum and other Viral Infections - 2103",
-  "2": "2. Melanoma 15.75k",
-  "3": "3. Atopic Dermatitis - 1.25k",
-  "4": "4. Basal Cell Carcinoma (BCC) 3323",
-  "5": "5. Melanocytic Nevi (NV) - 7970",
-  "6": "6. Benign Keratosis-like Lesions (BKL) 2624",
-  "7": "7. Psoriasis pictures Lichen Planus and related diseases - 2k",
-  "8": "8. Seborrheic Keratoses and other Benign Tumors - 1.8k",
-  "9": "9. Tinea Ringworm Candidiasis and other Fungal Infections - 1.7k"
+  "0": "Eczema",
+  "1": "Warts Molluscum",
+  "2": "Melanoma",
+  "3": "Atopic Dermatitis",
+  "4": "Basal Cell Carcinoma",
+  "5": "Melanocytic Nevi",
+  "6": "Benign Keratosis-like Lesions",
+  "7": "Psoriasis",
+  "8": "Seborrheic Keratoses / Benign Tumor",
+  "9": "Tinea Ringworm Candidiasis / Fungal Infections",
+  "10": "Warts Molluscum" 
 };
