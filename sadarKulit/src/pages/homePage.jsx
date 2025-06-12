@@ -3,12 +3,9 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Swal from "sweetalert2";
 import { classLabels } from "../data/classLabels";
-
-// --- PRASYARAT 1: Impor data dan komponen yang dibutuhkan ---
-import { firstAidData } from "../data/firstAidData"; // Pastikan path ini benar
-import DetectionResult from "../components/DetectionResult"; // Pastikan komponen ini ada dan path-nya benar
+import { firstAidData } from "../data/firstAidData";
+import DetectionResult from "../components/DetectionResult";
 import Footer from "../components/Footer";
-// ---------------------------------------------------------
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,13 +13,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  // --- PERUBAHAN 1: Tambahkan state baru untuk menyimpan hasil deteksi ---
   const [detectionResult, setDetectionResult] = useState(null);
-  // ----------------------------------------------------------------------
 
   const fetchHistory = async (token) => {
-    // ... (fungsi fetchHistory Anda tidak perlu diubah, sudah bagus)
     try {
       const response = await fetch("https://sadarkulit-be.vercel.app/history", {
         headers: {
@@ -43,7 +36,6 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    // ... (fungsi useEffect Anda tidak perlu diubah, sudah bagus)
     const token = localStorage.getItem("token");
     if (!token) {
       setIsLoggedIn(false);
@@ -57,11 +49,8 @@ export default function HomePage() {
   const handleUpload = async (e) => {
     e.preventDefault();
     const file = e.target.image.files[0];
-    
-    // Reset tampilan hasil sebelumnya setiap kali upload baru
     setDetectionResult(null);
 
-    // ... (Validasi file Anda tidak perlu diubah, sudah bagus)
     if (!file) {
       Swal.fire({ icon: "warning", title: "Pilih Gambar", text: "Silakan pilih gambar untuk diunggah!", confirmButtonColor: "#3085d6" });
       return;
@@ -99,31 +88,32 @@ export default function HomePage() {
         throw new Error(data.error || "Gagal mendeteksi penyakit kulit");
       }
 
-      // --- PERUBAHAN 2: Logika baru setelah mendapatkan hasil API ---
-      Swal.close(); // Tutup notifikasi loading
+      Swal.close();
 
-      // 1. Ekstrak ID dari string `predicted_disease`
-      const extractedId = data.predicted_disease.split('.')[0];
+      // Cari ID berdasarkan nama penyakit ramah dari backend
+      const diseaseName = data.predicted_disease;
+      const extractedId = Object.keys(classLabels).find(
+        key => classLabels[key] === diseaseName
+      );
 
-      // 2. Cari data yang cocok di dalam `firstAidData`
-      const matchedData = firstAidData.find(item => item.id === extractedId);
+      console.log(`Disease Name: "${diseaseName}", Extracted ID: "${extractedId}"`);
 
-      if (matchedData) {
-        // 3. Gabungkan data & simpan ke state `detectionResult`
-        const finalResult = { ...matchedData, confidence: data.confidence };
-        setDetectionResult(finalResult);
-
-        // 4. Scroll otomatis ke bagian hasil
-        setTimeout(() => {
-          document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+      if (extractedId) {
+        const matchedData = firstAidData.find(item => item.id === extractedId);
+        if (matchedData) {
+          const finalResult = { ...matchedData, confidence: data.confidence };
+          setDetectionResult(finalResult);
+          setTimeout(() => {
+            document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        } else {
+          throw new Error(`Informasi detail untuk "${diseaseName}" tidak ditemukan di firstAidData.`);
+        }
       } else {
-        throw new Error("Informasi detail untuk penyakit ini tidak ditemukan.");
+        throw new Error(`ID untuk "${diseaseName}" tidak ditemukan di classLabels.`);
       }
-      // -----------------------------------------------------------
 
-      await fetchHistory(token); // Tetap refresh riwayat
-
+      await fetchHistory(token);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -138,13 +128,9 @@ export default function HomePage() {
     const diseaseString = historyItem.detectedDisease;
     if (!diseaseString) return;
 
-    // --- LOGIKA BARU UNTUK MENCARI ID YANG BENAR ---
-    // Cari key (yaitu "0", "1", "2", dst.) di objek classLabels
-    // yang value-nya sama persis dengan nama penyakit yang diklik.
     const extractedId = Object.keys(classLabels).find(
       key => classLabels[key] === diseaseString
     );
-    // ---------------------------------------------
 
     console.log(`Penyakit: "${diseaseString}", ID yang ditemukan: "${extractedId}"`);
 
@@ -155,18 +141,17 @@ export default function HomePage() {
         setDetectionResult(resultToShow);
         document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
       } else {
-        // Ini terjadi jika ID ada di classLabels tapi tidak ada di firstAidData
         Swal.fire('Info', `Informasi detail untuk "${diseaseString}" tidak lengkap.`, 'info');
       }
     } else {
-      // Ini terjadi jika nama penyakit di riwayat tidak ada di classLabels
       Swal.fire('Info', `Tidak dapat menemukan ID untuk "${diseaseString}".`, 'info');
     }
   };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
-        {/* Hero Section */}
+      {/* Hero Section */}
       <div
         id="hero"
         className="relative py-12 px-4 sm:py-16 sm:px-6 md:py-24 md:px-10 bg-cover bg-center text-white"
@@ -190,10 +175,8 @@ export default function HomePage() {
       </div>
 
       <div id="deteksi">
-        
-        {/* 2. Ini adalah Upload Section Anda (id="deteksi" sudah dihapus dari sini) */}
         <div className="mt-8 sm:mt-12 md:mt-16 flex flex-col md:flex-row items-center justify-center px-4 sm:px-6">
-          <img
+          <anches
             src="/pemanis1.png"
             alt="SadarKulit Logo"
             className="w-full sm:max-w-sm md:max-w-md object-contain mb-6 md:mb-0 md:mr-8"
@@ -219,20 +202,15 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 3. Ini adalah Result Section Anda (tetap dengan id="result-section") */}
-        {/* Section ini akan muncul atau hilang di dalam wrapper 'deteksi' */}
         {detectionResult && (
           <div id="result-section" className="w-full max-w-4xl mx-auto my-12 sm:my-16 px-4 sm:px-6">
             <DetectionResult diseaseInfo={detectionResult} />
           </div>
         )}
       </div>
-      
-      {/* --- BAGIAN RIWAYAT (VERSI BARU DENGAN GAMBAR) --- */}
+
       <div id="riwayat" className="w-full bg-gray-50 py-12 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6">
-          
-          {/* Judul Section (tetap di tengah) */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">
               Riwayat Deteksi Anda
@@ -240,14 +218,9 @@ export default function HomePage() {
             <p className="text-gray-500 mt-2">Lihat kembali hasil deteksi yang pernah Anda lakukan.</p>
           </div>
 
-          {/* Kontainer utama dengan layout 2 kolom di layar medium (md) ke atas */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
-
-            {/* --- KOLOM KIRI: DAFTAR RIWAYAT --- */}
             <div className="w-full md:w-3/5 lg:w-1/2">
               <div className="status-container">
-                
-                {/* Kondisi Loading, Error, Belum Login, atau Riwayat Kosong */}
                 {loading && <p className="text-center text-gray-600">Loading riwayat...</p>}
                 {error && <p className="text-center text-red-600">Error: {error}</p>}
 
@@ -271,7 +244,6 @@ export default function HomePage() {
                   </p>
                 )}
 
-                {/* Tampilan utama untuk daftar riwayat jika ada data */}
                 {!loading && isLoggedIn && historyData.length > 0 && (
                   <div className="space-y-4">
                     {historyData.map((item, idx) => (
@@ -284,16 +256,12 @@ export default function HomePage() {
                             year: 'numeric', month: 'long', day: 'numeric'
                           })}
                         </span>
-
-                        {/* --- TAMBAHKAN onClick DI SINI --- */}
                         <button 
                           onClick={() => handleHistoryClick(item)} 
                           className="px-5 py-2 bg-cyan-500 text-white rounded-full text-sm sm:text-base font-semibold hover:bg-cyan-600 transition-colors duration-300"
                         >
                           {item.detectedDisease || "Tidak diketahui"}
                         </button>
-                        {/* ------------------------------- */}
-                        
                       </div>
                     ))}
                   </div>
@@ -301,8 +269,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* --- KOLOM KANAN: GAMBAR PEMANIS --- */}
-            {/* Gambar ini disembunyikan di layar kecil (mobile) dan muncul di layar medium ke atas */}
             <div className="hidden md:block md:w-2/5 lg:w-1/2 p-4">
               <img
                 src="/pemanis2.png"
@@ -310,7 +276,6 @@ export default function HomePage() {
                 className="w-full h-auto object-contain rounded-lg"
               />
             </div>
-
           </div>
         </div>
       </div>
