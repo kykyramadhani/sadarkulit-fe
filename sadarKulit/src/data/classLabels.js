@@ -10,5 +10,5 @@ export const classLabels = {
   "6": "Benign Keratosis-like Lesions",
   "7": "Psoriasis",
   "8": "Seborrheic Keratoses / Benign Tumor",
-  "9": "Tinea Ringworm Candidiasis / Fungal Infections",
+  "9": "Tinea Ringworm Candidiasis / Fungal Infections"
 };

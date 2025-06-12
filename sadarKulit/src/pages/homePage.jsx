@@ -9,6 +9,18 @@ import { firstAidData } from "../data/firstAidData"; // Pastikan path ini benar
 import DetectionResult from "../components/DetectionResult"; // Pastikan komponen ini ada dan path-nya benar
 import Footer from "../components/Footer";
 // ---------------------------------------------------------
+const reverseLabelMap = {
+  "1. Eczema 1677": "0",
+  "10. Warts Molluscum and other Viral Infections - 2103": "1",
+  "2. Melanoma 15.75k": "2",
+  "3. Atopic Dermatitis - 1.25k": "3",
+  "4. Basal Cell Carcinoma (BCC) 3323": "4",
+  "5. Melanocytic Nevi (NV) - 7970": "5",
+  "6. Benign Keratosis-like Lesions (BKL) 2624": "6",
+  "7. Psoriasis pictures Lichen Planus and related diseases - 2k": "7",
+  "8. Seborrheic Keratoses and other Benign Tumors - 1.8k": "8",
+  "9. Tinea Ringworm Candidiasis and other Fungal Infections - 1.7k": "9"
+};
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -101,27 +113,18 @@ export default function HomePage() {
 
       Swal.close();
 
-      // Cari ID berdasarkan nama penyakit ramah dari backend
-      const diseaseName = data.predicted_disease;
-      const extractedId = Object.keys(classLabels).find(
-        key => classLabels[key] === diseaseName
-      );
+      // Gunakan reverseLabelMap untuk mendapatkan ID
+      const extractedId = reverseLabelMap[data.predicted_disease];
+      const matchedData = firstAidData.find(item => item.id === extractedId);
 
-      console.log(`Disease Name: "${diseaseName}", Extracted ID: "${extractedId}"`);
-
-      if (extractedId) {
-        const matchedData = firstAidData.find(item => item.id === extractedId);
-        if (matchedData) {
-          const finalResult = { ...matchedData, confidence: data.confidence };
-          setDetectionResult(finalResult);
-          setTimeout(() => {
-            document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        } else {
-          throw new Error(`Informasi detail untuk "${diseaseName}" tidak ditemukan di firstAidData.`);
-        }
+      if (matchedData) {
+        const finalResult = { ...matchedData, confidence: data.confidence };
+        setDetectionResult(finalResult);
+        setTimeout(() => {
+          document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       } else {
-        throw new Error(`ID untuk "${diseaseName}" tidak ditemukan di classLabels.`);
+        throw new Error("Informasi detail untuk penyakit ini tidak ditemukan.");
       }
 
       await fetchHistory(token);
@@ -139,11 +142,8 @@ export default function HomePage() {
     const diseaseString = historyItem.detectedDisease;
     if (!diseaseString) return;
 
-    const extractedId = Object.keys(classLabels).find(
-      key => classLabels[key] === diseaseString
-    );
-
-    console.log(`Penyakit: "${diseaseString}", ID yang ditemukan: "${extractedId}"`);
+    // Gunakan reverseLabelMap untuk mencocokkan label asli dengan ID
+    const extractedId = reverseLabelMap[diseaseString];
 
     if (extractedId) {
       const matchedData = firstAidData.find(item => item.id === extractedId);
@@ -158,6 +158,7 @@ export default function HomePage() {
       Swal.fire('Info', `Tidak dapat menemukan ID untuk "${diseaseString}".`, 'info');
     }
   };
+  
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
