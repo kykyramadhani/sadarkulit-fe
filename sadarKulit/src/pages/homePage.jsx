@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Swal from "sweetalert2";
-import { classLabels } from "../data/classLabels";
 import { firstAidData } from "../data/firstAidData";
 import DetectionResult from "../components/DetectionResult";
 import Footer from "../components/Footer";
@@ -27,7 +26,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const [detectionResult, setDetectionResult] = useState(null);
+  const [detectionResult, setDetectionResult] = useState(null); // Ini akan menyimpan hasil deteksi
 
   const fetchHistory = async (token) => {
     try {
@@ -63,7 +62,7 @@ export default function HomePage() {
   const handleUpload = async (e) => {
     e.preventDefault();
     const file = e.target.image.files[0];
-    setDetectionResult(null);
+    setDetectionResult(null); // Reset hasil deteksi sebelumnya
 
     if (!file) {
       Swal.fire({
@@ -114,21 +113,39 @@ export default function HomePage() {
 
       Swal.close();
 
-      // Gunakan reverseLabelMap untuk mendapatkan ID
-      const extractedId = reverseLabelMap[data.predicted_disease];
-      const matchedData = firstAidData.find(item => item.id === extractedId);
-
-      if (matchedData) {
-        const finalResult = { ...matchedData, confidence: data.confidence };
-        setDetectionResult(finalResult);
-        setTimeout(() => {
-          document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
+      // --- LOGIKA BARU UNTUK MENENTUKAN "NORMAL" ---
+      if (data.confidence < 0.4) {
+        setDetectionResult({
+          diseaseName: "Normal",
+          causes: ["Tingkat keyakinan deteksi di bawah 40%.", "Perlu konsultasi lebih lanjut dengan ahli medis."],
+          firstAidSteps: [{
+            title: "Tinjau Kembali Gambar",
+            description: "Pastikan gambar yang diunggah jelas dan fokus. Unggah kembali jika perlu."
+          }, {
+            title: "Konsultasi Ahli Medis",
+            description: "Meskipun hasil menunjukkan 'Normal' dengan keyakinan rendah, sangat disarankan untuk tetap berkonsultasi dengan dokter kulit untuk diagnosis akurat."
+          }],
+          confidence: data.confidence
+        });
       } else {
-        throw new Error("Informasi detail untuk penyakit ini tidak ditemukan.");
-      }
+        // Logika yang sudah ada untuk penyakit yang terdeteksi dengan keyakinan tinggi
+        const extractedId = reverseLabelMap[data.predicted_disease];
+        const matchedData = firstAidData.find(item => item.id === extractedId);
 
-      await fetchHistory(token);
+        if (matchedData) {
+          const finalResult = { ...matchedData, confidence: data.confidence };
+          setDetectionResult(finalResult);
+        } else {
+          throw new Error("Informasi detail untuk penyakit ini tidak ditemukan.");
+        }
+      }
+      // --- AKHIR LOGIKA BARU ---
+
+      setTimeout(() => {
+        document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
+      await fetchHistory(token); // Perbarui riwayat setelah deteksi
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -143,13 +160,16 @@ export default function HomePage() {
     const diseaseString = historyItem.detectedDisease;
     if (!diseaseString) return;
 
-    // Gunakan reverseLabelMap untuk mencocokkan label user-friendly dengan ID
+    // Untuk riwayat, kita asumsikan semua adalah penyakit yang terdeteksi
+    // Jika Anda juga ingin menampilkan "Normal" dari riwayat, Anda perlu menyimpan "Normal" sebagai detectedDisease di backend
     const extractedId = reverseLabelMap[diseaseString];
 
     if (extractedId) {
       const matchedData = firstAidData.find(item => item.id === extractedId);
       if (matchedData) {
         const resultToShow = { ...matchedData };
+        // Jika Anda menyimpan confidence di riwayat, tambahkan di sini juga
+        // if (historyItem.confidence) resultToShow.confidence = historyItem.confidence;
         setDetectionResult(resultToShow);
         document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
       } else {
@@ -159,10 +179,11 @@ export default function HomePage() {
       Swal.fire('Info', `Tidak dapat menemukan ID untuk "${diseaseString}".`, 'info');
     }
   };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar />
-        {/* Hero Section */}
+      {/* Hero Section */}
       <div
         id="hero"
         className="relative py-12 px-4 sm:py-16 sm:px-6 md:py-24 md:px-10 bg-cover bg-center text-white"
@@ -186,7 +207,7 @@ export default function HomePage() {
       </div>
 
       <div id="deteksi">
-        
+
         {/* 2. Ini adalah Upload Section Anda (id="deteksi" sudah dihapus dari sini) */}
         <div className="mt-8 sm:mt-12 md:mt-16 flex flex-col md:flex-row items-center justify-center px-4 sm:px-6">
           <img
@@ -223,11 +244,11 @@ export default function HomePage() {
           </div>
         )}
       </div>
-      
+
       {/* --- BAGIAN RIWAYAT (VERSI BARU DENGAN GAMBAR) --- */}
       <div id="riwayat" className="w-full bg-gray-50 py-12 sm:py-16">
         <div className="container mx-auto px-4 sm:px-6">
-          
+
           {/* Judul Section (tetap di tengah) */}
           <div className="text-center mb-10">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">
@@ -242,7 +263,7 @@ export default function HomePage() {
             {/* --- KOLOM KIRI: DAFTAR RIWAYAT --- */}
             <div className="w-full md:w-3/5 lg:w-1/2">
               <div className="status-container">
-                
+
                 {/* Kondisi Loading, Error, Belum Login, atau Riwayat Kosong */}
                 {loading && <p className="text-center text-gray-600">Loading riwayat...</p>}
                 {error && <p className="text-center text-red-600">Error: {error}</p>}
@@ -271,8 +292,8 @@ export default function HomePage() {
                 {!loading && isLoggedIn && historyData.length > 0 && (
                   <div className="space-y-4">
                     {historyData.map((item, idx) => (
-                      <div 
-                        key={item._id || idx} 
+                      <div
+                        key={item._id || idx}
                         className="flex items-center justify-between bg-white p-4 rounded-xl shadow-md border-l-4 border-cyan-500 hover:shadow-lg transition-shadow duration-300"
                       >
                         <span className="font-mono text-sm sm:text-base text-gray-500">
@@ -282,14 +303,14 @@ export default function HomePage() {
                         </span>
 
                         {/* --- TAMBAHKAN onClick DI SINI --- */}
-                        <button 
-                          onClick={() => handleHistoryClick(item)} 
+                        <button
+                          onClick={() => handleHistoryClick(item)}
                           className="px-5 py-2 bg-cyan-500 text-white rounded-full text-sm sm:text-base font-semibold hover:bg-cyan-600 transition-colors duration-300"
                         >
                           {item.detectedDisease || "Tidak diketahui"}
                         </button>
                         {/* ------------------------------- */}
-                        
+
                       </div>
                     ))}
                   </div>
