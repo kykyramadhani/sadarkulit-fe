@@ -1,7 +1,7 @@
 export const firstAidData = [
   {
     id: "0",
-    diseaseName: "1. Eczema 1677", // Diupdate
+    diseaseName: "Eczema", // Diupdate
     causes: [
       "Faktor genetik atau riwayat keluarga dengan kondisi serupa.",
       "Reaksi alergi terhadap pemicu seperti debu, bulu binatang, sabun, atau makanan tertentu.",
@@ -29,7 +29,7 @@ export const firstAidData = [
   },
   {
     id: "1",
-    diseaseName: "10. Warts Molluscum and other Viral Infections - 2103", // Diupdate
+    diseaseName: "Warts Molluscum", // Diupdate
     causes: [
       "Infeksi oleh Human Papillomavirus (HPV) untuk kutil.",
       "Infeksi oleh virus Pox untuk Molluscum Contagiosum.",
@@ -57,7 +57,7 @@ export const firstAidData = [
   },
   {
     id: "2",
-    diseaseName: "2. Melanoma 15.75k", // Diupdate
+    diseaseName: "Melanoma", // Diupdate
     causes: [
       "Paparan berlebihan terhadap sinar ultraviolet (UV) dari matahari.",
       "Penggunaan tanning bed (alat penggelap kulit).",
@@ -78,7 +78,7 @@ export const firstAidData = [
   },
   {
     id: "3",
-    diseaseName: "3. Atopic Dermatitis - 1.25k", // Diupdate
+    diseaseName: "Atopic Dermatitis", // Diupdate
     causes: [
       "Kombinasi faktor genetik, terutama yang memengaruhi protein pelindung kulit (filaggrin).",
       "Sistem imun yang terlalu aktif (overaktif).",
@@ -106,7 +106,7 @@ export const firstAidData = [
   },
   {
     id: "4",
-    diseaseName: "4. Basal Cell Carcinoma (BCC) 3323", // Diupdate
+    diseaseName: "Basal Cell Carcinoma", 
     causes: [
       "Paparan sinar UV jangka panjang dan kumulatif dari matahari.",
       "Riwayat sering terbakar sinar matahari, terutama di masa kecil.",
@@ -126,7 +126,7 @@ export const firstAidData = [
   },
   {
     id: "5",
-    diseaseName: "5. Melanocytic Nevi (NV) - 7970", // Diupdate
+    diseaseName: "Melanocytic Nevi", // Diupdate
     causes: [
       "Pertumbuhan sel penghasil pigmen (melanosit) yang berkelompok.",
       "Faktor genetik sangat menentukan jumlah dan jenis tahi lalat.",
@@ -149,7 +149,7 @@ export const firstAidData = [
   },
   {
     id: "6",
-    diseaseName: "6. Benign Keratosis-like Lesions (BKL) 2624", // Diupdate
+    diseaseName: "Benign Keratosis-like Lesions", // Diupdate
     causes: [
       "Penyebab pastinya tidak sepenuhnya diketahui.",
       "Sangat terkait dengan proses penuaan alami kulit.",
@@ -169,7 +169,7 @@ export const firstAidData = [
   },
   {
     id: "7",
-    diseaseName: "7. Psoriasis pictures Lichen Planus and related diseases - 2k", // Diupdate
+    diseaseName: "Psoriasis", // Diupdate
     causes: [
       "Kondisi autoimun, di mana sistem kekebalan tubuh secara keliru menyerang sel kulit yang sehat.",
       "Proses regenerasi kulit menjadi terlalu cepat, menyebabkan penumpukan sel kulit.",
@@ -197,7 +197,7 @@ export const firstAidData = [
   },
   {
     id: "8",
-    diseaseName: "8. Seborrheic Keratoses and other Benign Tumors - 1.8k", // Diupdate
+    diseaseName: "Seborrheic Keratoses / Benign Tumor", // Diupdate
     causes: [
       "Penyebab pasti tidak diketahui, tetapi sangat umum terjadi seiring bertambahnya usia.",
       "Memiliki komponen genetik atau keturunan yang kuat.",
@@ -217,7 +217,7 @@ export const firstAidData = [
   },
   {
     id: "9",
-    diseaseName: "9. Tinea Ringworm Candidiasis and other Fungal Infections - 1.7k", // Diupdate
+    diseaseName: "Tinea Ringworm Candidiasis / Fungal Infections", // Diupdate
     causes: [
       "Disebabkan oleh jamur jenis dermatofita yang tumbuh subur di area kulit yang hangat dan lembap.",
       "Penularan melalui kontak langsung dengan orang atau hewan yang terinfeksi.",
