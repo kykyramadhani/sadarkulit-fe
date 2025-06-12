@@ -3,12 +3,23 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Swal from "sweetalert2";
 import { classLabels } from "../data/classLabels";
-
-// --- PRASYARAT 1: Impor data dan komponen yang dibutuhkan ---
-import { firstAidData } from "../data/firstAidData"; // Pastikan path ini benar
-import DetectionResult from "../components/DetectionResult"; // Pastikan komponen ini ada dan path-nya benar
+import { firstAidData } from "../data/firstAidData";
+import DetectionResult from "../components/DetectionResult";
 import Footer from "../components/Footer";
-// ---------------------------------------------------------
+
+// Peta untuk mencocokkan label user-friendly dengan ID
+const reverseLabelMap = {
+  "Eczema": "0",
+  "Warts Molluscum": "1",
+  "Melanoma": "2",
+  "Atopic Dermatitis": "3",
+  "Basal Cell Carcinoma": "4",
+  "Melanocytic Nevi": "5",
+  "Benign Keratosis-like Lesions": "6",
+  "Psoriasis": "7",
+  "Seborrheic Keratoses / Benign Tumor": "8",
+  "Tinea Ringworm Candidiasis / Fungal Infections": "9"
+};
 
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,13 +27,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
-  // --- PERUBAHAN 1: Tambahkan state baru untuk menyimpan hasil deteksi ---
   const [detectionResult, setDetectionResult] = useState(null);
-  // ----------------------------------------------------------------------
 
   const fetchHistory = async (token) => {
-    // ... (fungsi fetchHistory Anda tidak perlu diubah, sudah bagus)
     try {
       const response = await fetch("https://sadarkulit-be.vercel.app/history", {
         headers: {
@@ -43,7 +50,6 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    // ... (fungsi useEffect Anda tidak perlu diubah, sudah bagus)
     const token = localStorage.getItem("token");
     if (!token) {
       setIsLoggedIn(false);
@@ -57,17 +63,24 @@ export default function HomePage() {
   const handleUpload = async (e) => {
     e.preventDefault();
     const file = e.target.image.files[0];
-    
-    // Reset tampilan hasil sebelumnya setiap kali upload baru
     setDetectionResult(null);
 
-    // ... (Validasi file Anda tidak perlu diubah, sudah bagus)
     if (!file) {
-      Swal.fire({ icon: "warning", title: "Pilih Gambar", text: "Silakan pilih gambar untuk diunggah!", confirmButtonColor: "#3085d6" });
+      Swal.fire({
+        icon: "warning",
+        title: "Pilih Gambar",
+        text: "Silakan pilih gambar untuk diunggah!",
+        confirmButtonColor: "#3085d6",
+      });
       return;
     }
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      Swal.fire({ icon: "warning", title: "Format Tidak Didukung", text: "Hanya file JPEG, PNG, atau WEBP yang diizinkan!", confirmButtonColor: "#3085d6" });
+      Swal.fire({
+        icon: "warning",
+        title: "Format Tidak Didukung",
+        text: "Hanya file JPEG, PNG, atau WEBP yang diizinkan!",
+        confirmButtonColor: "#3085d6",
+      });
       return;
     }
 
@@ -99,31 +112,23 @@ export default function HomePage() {
         throw new Error(data.error || "Gagal mendeteksi penyakit kulit");
       }
 
-      // --- PERUBAHAN 2: Logika baru setelah mendapatkan hasil API ---
-      Swal.close(); // Tutup notifikasi loading
+      Swal.close();
 
-      // 1. Ekstrak ID dari string `predicted_disease`
-      const extractedId = data.predicted_disease.split('.')[0];
-
-      // 2. Cari data yang cocok di dalam `firstAidData`
+      // Gunakan reverseLabelMap untuk mendapatkan ID
+      const extractedId = reverseLabelMap[data.predicted_disease];
       const matchedData = firstAidData.find(item => item.id === extractedId);
 
       if (matchedData) {
-        // 3. Gabungkan data & simpan ke state `detectionResult`
         const finalResult = { ...matchedData, confidence: data.confidence };
         setDetectionResult(finalResult);
-
-        // 4. Scroll otomatis ke bagian hasil
         setTimeout(() => {
           document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
       } else {
         throw new Error("Informasi detail untuk penyakit ini tidak ditemukan.");
       }
-      // -----------------------------------------------------------
 
-      await fetchHistory(token); // Tetap refresh riwayat
-
+      await fetchHistory(token);
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -138,15 +143,8 @@ export default function HomePage() {
     const diseaseString = historyItem.detectedDisease;
     if (!diseaseString) return;
 
-    // --- LOGIKA BARU UNTUK MENCARI ID YANG BENAR ---
-    // Cari key (yaitu "0", "1", "2", dst.) di objek classLabels
-    // yang value-nya sama persis dengan nama penyakit yang diklik.
-    const extractedId = Object.keys(classLabels).find(
-      key => classLabels[key] === diseaseString
-    );
-    // ---------------------------------------------
-
-    console.log(`Penyakit: "${diseaseString}", ID yang ditemukan: "${extractedId}"`);
+    // Gunakan reverseLabelMap untuk mencocokkan label user-friendly dengan ID
+    const extractedId = reverseLabelMap[diseaseString];
 
     if (extractedId) {
       const matchedData = firstAidData.find(item => item.id === extractedId);
@@ -155,11 +153,9 @@ export default function HomePage() {
         setDetectionResult(resultToShow);
         document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
       } else {
-        // Ini terjadi jika ID ada di classLabels tapi tidak ada di firstAidData
         Swal.fire('Info', `Informasi detail untuk "${diseaseString}" tidak lengkap.`, 'info');
       }
     } else {
-      // Ini terjadi jika nama penyakit di riwayat tidak ada di classLabels
       Swal.fire('Info', `Tidak dapat menemukan ID untuk "${diseaseString}".`, 'info');
     }
   };
